@@ -43,10 +43,75 @@ public class Main {
         return jogadorComMaisGolsFiltro(linha -> linha.contains("Penalty"));
     }
 
+    public static List<String> estatisticasCampeonato(
+            Predicate<String> filtro,
+            int coluna,
+            String minOuMax
+    ) {
+        Stream<String> partidas = lerCSVAsStream("src/resources/campeonato-brasileiro-full.csv");
+
+        Map<String, Long> contagemPorTime = partidas
+                .filter(filtro)
+                .map(linha -> linha.split(",")[coluna].trim())
+                .collect(
+                        Collectors.groupingBy(
+                                time -> time,
+                                Collectors.counting()
+                        )
+                );
+
+        Long vitorias;
+
+        if (minOuMax.equals("max")) {
+            vitorias= contagemPorTime
+                    .values()
+                    .stream()
+                    .max(Long::compare)
+                    .orElse(0L);
+        } else if (minOuMax.equals("min")) {
+            vitorias= contagemPorTime
+                    .values()
+                    .stream()
+                    .min(Long::compare)
+                    .orElse(0L);
+        } else {
+            vitorias = 0L;
+        }
+
+        return contagemPorTime
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(vitorias))
+                .map(Map.Entry::getKey)
+                .toList();
+    }
+
+    public static List<String> timeComMaisVitorias() {
+        return estatisticasCampeonato(
+                linha -> linha.contains("2008") && !linha.contains("-"),
+                10,
+                "max"
+        );
+    }
+
+    public static List<String> estadoComMenosVitoria() {
+        return estatisticasCampeonato(
+                linha -> !linha.contains("mandante"),
+                14,
+                "min"
+        );
+    }
 
     public static void main(String[] args) {
+        // Adir Silva Filho:
         //O time que mais venceu jogos no ano 2008
+        System.out.println("\nTime(s) com maior número de vitórias:");
+        timeComMaisVitorias().forEach(System.out::println);
+
         //O Estado que teve menos jogos dentro do período 2003 e 2022
+        System.out.println("\nEstado(s) com menor número de partidas:");
+        estadoComMenosVitoria().forEach(System.out::println);
+        System.out.println();
 
         //O jogador que mais fez gols
         //O jogador que mais fez gols de pênaltis
