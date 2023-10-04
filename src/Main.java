@@ -21,7 +21,7 @@ public class Main {
         }
     }
 
-    private static List<String> jogadorComMaisGolsFiltro(Predicate<String> filtro) {
+    private static List<AbstractMap.SimpleEntry<String, Long>> jogadorComMaisGolsFiltro(Predicate<String> filtro) {
         Stream<String> gols = lerCSVAsStream("src/resources/campeonato-brasileiro-gols.csv");
 
         Map<String, Long> contagemPorJogador = gols
@@ -33,19 +33,19 @@ public class Main {
 
         return contagemPorJogador.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(maxGols))
-                .map(Map.Entry::getKey)
+                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 
-    public static List<String> jogadorComMaisGols() {
+    public static List<AbstractMap.SimpleEntry<String, Long>> jogadorComMaisGols() {
         return jogadorComMaisGolsFiltro(linha -> true);
     }
 
-    public static List<String> jogadorComMaisGolsDePenalti() {
+    public static List<AbstractMap.SimpleEntry<String, Long>> jogadorComMaisGolsDePenalti() {
         return jogadorComMaisGolsFiltro(linha -> linha.contains("Penalty"));
     }
 
-    public static List<String> jogadorComMaisGolsContra() {
+    public static List<AbstractMap.SimpleEntry<String, Long>> jogadorComMaisGolsContra() {
         return jogadorComMaisGolsFiltro(linha -> linha.contains("Gol Contra"));
     }
 
@@ -174,41 +174,40 @@ public class Main {
     public static void main(String[] args) {
         // Adir Silva Filho:
         //O time que mais venceu jogos no ano 2008
-        System.out.println("\nTime(s) com maior número de vitórias no ano 2008:");
-        timeComMaisVitorias().forEach(System.out::println);
-        //O Estado que teve menos jogos dentro do período 2003 e 2022
-        System.out.println("\nEstado(s) com menor número de partidas do período 2003 e 2022:");
-        estadoComMenosVitoria().forEach(System.out::println);
-        System.out.println();
+        System.out.println("=============================================");
+        System.out.println("                 ESTATÍSTICAS              ");
+        System.out.println("=============================================");
 
-        System.out.print("Estatistica de Gols");
-        //O jogador que mais fez gols
-        System.out.println("\nO jogador(es) que mais fez gols:");
-        jogadorComMaisGols().forEach(System.out::println);
-        //O jogador que mais fez gols de pênaltis
-        System.out.println("\nO jogador(es) que mais fez gols de pênalti:");
-        jogadorComMaisGolsDePenalti().forEach(System.out::println);
-        //O jogador que mais fez gols contras
-        System.out.println("\nJogador(es) com mais gols contra:");
-        jogadorComMaisGolsContra().forEach(System.out::println);
-        System.out.println();
+        System.out.println("\n▶ Time(s) com maior número de vitórias no ano 2008:");
+        timeComMaisVitorias().forEach(time -> System.out.println("   • " + time));
 
-        System.out.print("Estatistica de Cartões");
-        //O jogador que mais recebeu cartões amarelos
-        System.out.println("\nJogador(es) com mais cartões Amarelo:");
-        jogadorComMaisCartaoAmarelo().forEach(System.out::println);
+        System.out.println("\n▶ Estado(s) com menor número de partidas do período 2003 e 2022:");
+        estadoComMenosVitoria().forEach(estado -> System.out.println("   • " + estado));
+        System.out.println("\n---------------------------------------------");
 
-        //Matheus Vitor
-        //O jogador que mais recebeu cartões vermelhos
-        System.out.println("\nJogador(es) com mais cartões Vermelho:");
-        System.out.println();
+        System.out.println("\n▶ Estatística de Gols");
+        System.out.println("\n   • Jogador(es) que mais fizeram gols:");
+        jogadorComMaisGols().forEach(entry -> System.out.println("     - " + entry.getKey() + ": " + entry.getValue() + " gols"));
 
-        System.out.print("Placar da partida");
-        //O placar da partida com mais gols.
-        System.out.println("Jogador(es) com mais cartões vermelhos:");
-        jogadorComMaisCartoesVermelhos().forEach(System.out::println);
-        System.out.println("Partida(s) com mais gols:");
-        partidasComMaisGols().forEach(System.out::println);
+        System.out.println("\n   • Jogador(es) que mais fizeram gols de pênalti:");
+        jogadorComMaisGolsDePenalti().forEach(entry -> System.out.println("     - " + entry.getKey() + ": " + entry.getValue() + " gols"));
+
+        System.out.println("\n   • Jogador(es) com mais gols contra:");
+        jogadorComMaisGolsContra().forEach(entry -> System.out.println("     - " + entry.getKey() + ": " + entry.getValue() + " gols"));
+
+        System.out.println("\n▶ Estatística de Cartões");
+        System.out.println("\n   • Jogador(es) com mais cartões Amarelo:");
+        jogadorComMaisCartaoAmarelo().forEach(jogador -> System.out.println("     - " + jogador));
+
+        System.out.println("\n   • Jogador(es) com mais cartões vermelhos:");
+        jogadorComMaisCartoesVermelhos().forEach(jogador -> System.out.println("     - " + jogador));
+
+        System.out.println("\n   • Partida(s) com mais gols:");
+        partidasComMaisGols().forEach(partida -> System.out.println("     - " + partida));
+
+        System.out.println("\n=============================================");
+        System.out.println("              FIM DE RELATÓRIO             ");
+        System.out.println("=============================================");
 
     }
 }
