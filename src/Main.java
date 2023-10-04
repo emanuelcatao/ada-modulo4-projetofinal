@@ -49,9 +49,8 @@ public class Main {
         return jogadorComMaisGolsFiltro(linha -> linha.contains("Gol Contra"));
     }
 
-    private static List<String> jogadorComMaisCartaoFiltro(Predicate<String> filtro) {
+    private static List<AbstractMap.SimpleEntry<String, Long>> jogadorComMaisCartaoFiltro(Predicate<String> filtro) {
         Stream<String> cartao = lerCSVAsStream("src/resources/campeonato-brasileiro-cartoes.csv");
-
 
         Map<String, Long> contagemCartaoPorJogador = cartao
                 .filter(filtro)
@@ -60,17 +59,19 @@ public class Main {
 
         Long maxCartao = contagemCartaoPorJogador.values().stream().max(Long::compare).orElse(0L);
 
-
         return contagemCartaoPorJogador.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(maxCartao))
-                .map(Map.Entry::getKey)
+                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
   
-    public static List<String> jogadorComMaisCartaoAmarelo() {
+    public static List<AbstractMap.SimpleEntry<String, Long>> jogadorComMaisCartaoAmarelo() {
         return jogadorComMaisCartaoFiltro(linha -> linha.contains("Amarelo"));
     }
 
+    private static List<AbstractMap.SimpleEntry<String, Long>> jogadorComMaisCartoesVermelhos() {
+        return jogadorComMaisCartaoFiltro(linha -> linha.contains("Vermelho"));
+    }
 
     public static List<String> estatisticasCampeonato(
             Predicate<String> filtro,
@@ -123,28 +124,12 @@ public class Main {
         );
     }
 
-    public static List<String> estadoComMenosVitoria() {
+    public static List<String> estadoQueMenosRecebeuJogos() {
         return estatisticasCampeonato(
                 linha -> !linha.contains("mandante"),
                 14,
                 "min"
         );
-    }
-
-    private static List<String> jogadorComMaisCartoesVermelhos() {
-        Stream<String> cartoes = lerCSVAsStream("src/resources/campeonato-brasileiro-cartoes.csv");
-
-        Map<String, Long> contagemPorJogador = cartoes
-                .filter(linha -> linha.contains("Vermelho"))
-                .map(linha -> linha.split(",")[4].trim())
-                .collect(Collectors.groupingBy(jogador -> jogador, Collectors.counting()));
-
-        Long maxCartoesVermelhos = contagemPorJogador.values().stream().max(Long::compare).orElse(0L);
-
-        return contagemPorJogador.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(maxCartoesVermelhos))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
     }
 
     private static List<String> partidasComMaisGols() {
@@ -167,10 +152,6 @@ public class Main {
         return partidasComMaxGols;
     }
 
-
-
-
-
     public static void main(String[] args) {
         // Adir Silva Filho:
         //O time que mais venceu jogos no ano 2008
@@ -182,7 +163,7 @@ public class Main {
         timeComMaisVitorias().forEach(time -> System.out.println("   • " + time));
 
         System.out.println("\n▶ Estado(s) com menor número de partidas do período 2003 e 2022:");
-        estadoComMenosVitoria().forEach(estado -> System.out.println("   • " + estado));
+        estadoQueMenosRecebeuJogos().forEach(estado -> System.out.println("   • " + estado));
         System.out.println("\n---------------------------------------------");
 
         System.out.println("\n▶ Estatística de Gols");
@@ -196,12 +177,13 @@ public class Main {
         jogadorComMaisGolsContra().forEach(entry -> System.out.println("     - " + entry.getKey() + ": " + entry.getValue() + " gols"));
 
         System.out.println("\n▶ Estatística de Cartões");
-        System.out.println("\n   • Jogador(es) com mais cartões Amarelo:");
-        jogadorComMaisCartaoAmarelo().forEach(jogador -> System.out.println("     - " + jogador));
+        System.out.println("\n   • Jogador(es) com mais cartões amarelos:");
+        jogadorComMaisCartaoAmarelo().forEach(entry -> System.out.println("     - " + entry.getKey() + ": " + entry.getValue() + " cartões"));
 
         System.out.println("\n   • Jogador(es) com mais cartões vermelhos:");
-        jogadorComMaisCartoesVermelhos().forEach(jogador -> System.out.println("     - " + jogador));
+        jogadorComMaisCartoesVermelhos().forEach(entry -> System.out.println("     - " + entry.getKey() + ": " + entry.getValue() + " cartões"));
 
+        System.out.println("\n▶ Estatística de Partidas");
         System.out.println("\n   • Partida(s) com mais gols:");
         partidasComMaisGols().forEach(partida -> System.out.println("     - " + partida));
 
