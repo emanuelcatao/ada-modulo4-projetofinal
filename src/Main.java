@@ -69,7 +69,7 @@ public class Main {
         return jogadorComMaisCartaoFiltro(linha -> linha.contains("Amarelo"));
     }
 
-    private static List<AbstractMap.SimpleEntry<String, Long>> jogadorComMaisCartoesVermelhos() {
+    public static List<AbstractMap.SimpleEntry<String, Long>> jogadorComMaisCartoesVermelhos() {
         return jogadorComMaisCartaoFiltro(linha -> linha.contains("Vermelho"));
     }
 
@@ -132,7 +132,7 @@ public class Main {
         );
     }
 
-    private static List<String> partidasComMaisGols() {
+    public static List<String> partidasComMaisGols() {
         Stream<String> partidas = lerCSVAsStream("src/resources/campeonato-brasileiro-full.csv");
 
         Map<Integer, List<String>> partidasPorContagem = partidas
@@ -153,8 +153,6 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        // Adir Silva Filho:
-        //O time que mais venceu jogos no ano 2008
         System.out.println("=============================================");
         System.out.println("                 ESTATÍSTICAS              ");
         System.out.println("=============================================");
@@ -191,5 +189,7 @@ public class Main {
         System.out.println("              FIM DE RELATÓRIO             ");
         System.out.println("=============================================");
 
+        //String relatorio = GerarMD.gerarRelatorioMarkdown();
+        //GerarMD.gravarEmArquivoMD(relatorio, "RelatorioEstatisticas");
     }
 }
